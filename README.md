@@ -20,6 +20,18 @@
 
 ---
 
+## 🗂️ My Other GitHub Spaces
+
+I keep different projects in different corners of GitHub—because organization is underrated and chaos is overrated.
+
+- **Web Development Playground**  
+  👉 https://github.com/mahadyhassanutsho  
+
+- **Interpreters & Compilers Experiments**  
+  👉 https://github.com/utshowmh  
+
+---
+
 ## 💻 Tech Stack
 
 ### **Frontend**
