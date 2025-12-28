@@ -87,12 +87,22 @@ I keep different projects in different corners of GitHub—because organization 
 
 ## 📊 GitHub Stats
 
-![](https://github-readme-stats.vercel.app/api?username=utshomh&theme=transparent&hide_border=false&include_all_commits=true&count_private=true)  
-![](https://nirzak-streak-stats.vercel.app/?user=utshomh&theme=transparent&hide_border=false)  
-![](https://github-readme-stats.vercel.app/api/top-langs/?username=utshomh&theme=transparent&hide_border=false&include_all_commits=true&count_private=true&layout=compact)
+<div align="center">
+
+  <p>
+    <img src="https://github-readme-stats-eight-theta.vercel.app/api?username=utshomh&theme=dark&hide_border=false&include_all_commits=true&count_private=true" alt="GitHub Stats" height="150" />
+  </p>
+
+  <p>
+    <img src="https://nirzak-streak-stats.vercel.app/?user=utshomh&theme=dark&hide_border=false" alt="Streak Stats" height="150" />
+  </p>
+
+  <p>
+    <img src="https://github-readme-stats-eight-theta.vercel.app/api/top-langs/?username=utshomh&theme=dark&hide_border=false&include_all_commits=true&count_private=true&layout=compact" alt="Top Langs" height="150" />
+  </p>
+
+</div>
 
 ---
 
 [![Visit Count](https://visitcount.itsvg.in/api?id=utshomh&icon=0&color=0)](https://visitcount.itsvg.in)
-
-<!-- Proudly created with GPRM ( https://gprm.itsvg.in ) -->
