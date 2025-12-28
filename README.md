@@ -93,16 +93,6 @@ I keep different projects in different corners of GitHub—because organization 
 
 ---
 
-### ✍️ Random Dev Quote
-
-![Dev Quote](https://quotes-github-readme.vercel.app/api?type=horizontal&theme=radical)
-
-### 🔝 Top Contributed Repositories
-
-![Top Repos](https://github-contributor-stats.vercel.app/api?username=utshomh&limit=5&theme=transparent&combine_all_yearly_contributions=true)
-
----
-
 [![Visit Count](https://visitcount.itsvg.in/api?id=utshomh&icon=0&color=0)](https://visitcount.itsvg.in)
 
 <!-- Proudly created with GPRM ( https://gprm.itsvg.in ) -->
