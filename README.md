@@ -3,7 +3,7 @@
 ## 💫 About Me
 
 - 🔥 I am deeply passionate about web development — from crafting clean UI to building scalable backend systems, I love turning ideas into smooth, functional digital experiences.
-- 🔭 Currently building ZapShift
+- 🔭 Currently building [CareIO](https://github.com/utshomh/care-io)
 - 👯 Open to collaborating on MERN Stack projects
 - 🌱 Learning Golang
 - 📍 Based in Dhaka, Bangladesh
