@@ -34,9 +34,9 @@
     </g>
 <g font-family="Inter, Segoe UI, Arial, sans-serif">
       <text x="62" y="173" fill="#D1D5DB" font-size="14" font-weight="800">JavaScript</text>
-      <text x="678" y="173" fill="#9CA3AF" font-size="12" text-anchor="end">18%</text>
+      <text x="678" y="173" fill="#9CA3AF" font-size="12" text-anchor="end">19%</text>
       <rect x="190" y="159" width="445" height="15" rx="8" fill="#202A3F"/>
-      <rect x="190" y="159" width="70" height="15" rx="8" fill="#F7DF1E"><animate attributeName="width" from="0" to="70" dur="0.7799999999999999s" fill="freeze"/></rect>
+      <rect x="190" y="159" width="74" height="15" rx="8" fill="#F7DF1E"><animate attributeName="width" from="0" to="74" dur="0.7799999999999999s" fill="freeze"/></rect>
     </g>
 <g font-family="Inter, Segoe UI, Arial, sans-serif">
       <text x="62" y="204" fill="#D1D5DB" font-size="14" font-weight="800">Rust</text>
