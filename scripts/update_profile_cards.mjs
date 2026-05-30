@@ -2,7 +2,9 @@ import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 const PROFILE_USERNAME = process.env.PROFILE_USERNAME || "utshomh";
-const EXTRA_GITHUB_USERS = (process.env.EXTRA_GITHUB_USERS || "utshowmh,utsho-fleekbd")
+const EXTRA_GITHUB_USERS = (
+  process.env.EXTRA_GITHUB_USERS || "utshowmh,mahadyhassanutsho,utsho-fleekbd"
+)
   .split(",")
   .map((user) => user.trim())
   .filter(Boolean);
@@ -60,7 +62,9 @@ async function fetchJson(url) {
   const response = await fetch(url, { headers });
   if (!response.ok) {
     const body = await response.text();
-    throw new Error(`GitHub API request failed: ${response.status} ${response.statusText}\n${url}\n${body.slice(0, 300)}`);
+    throw new Error(
+      `GitHub API request failed: ${response.status} ${response.statusText}\n${url}\n${body.slice(0, 300)}`,
+    );
   }
   return response.json();
 }
@@ -78,7 +82,9 @@ async function fetchAllPages(firstUrl) {
     const response = await fetch(url, { headers });
     if (!response.ok) {
       const body = await response.text();
-      throw new Error(`GitHub API request failed: ${response.status} ${response.statusText}\n${url}\n${body.slice(0, 300)}`);
+      throw new Error(
+        `GitHub API request failed: ${response.status} ${response.statusText}\n${url}\n${body.slice(0, 300)}`,
+      );
     }
     const page = await response.json();
     results.push(...page);
@@ -117,9 +123,12 @@ async function fetchContributionCalendar(login) {
   });
   if (!response.ok) return null;
   const json = await response.json();
-  const calendar = json.data?.user?.contributionsCollection?.contributionCalendar;
+  const calendar =
+    json.data?.user?.contributionsCollection?.contributionCalendar;
   if (!calendar) return null;
-  const days = calendar.weeks.flatMap((week) => week.contributionDays).sort((a, b) => a.date.localeCompare(b.date));
+  const days = calendar.weeks
+    .flatMap((week) => week.contributionDays)
+    .sort((a, b) => a.date.localeCompare(b.date));
   let longest = 0;
   let run = 0;
   for (const day of days) {
@@ -138,7 +147,9 @@ async function fetchContributionCalendar(login) {
     else break;
   }
   const activeDays = days.filter((day) => day.contributionCount > 0).length;
-  const lastActive = [...days].reverse().find((day) => day.contributionCount > 0)?.date || "No activity yet";
+  const lastActive =
+    [...days].reverse().find((day) => day.contributionCount > 0)?.date ||
+    "No activity yet";
   return {
     current,
     longest,
@@ -169,7 +180,10 @@ function fallbackData(errorMessage = "") {
       { name: "CSS", pct: 3, color: PALETTE.CSS },
       { name: "Lua", pct: 2, color: PALETTE.Lua },
     ],
-    latestRepo: { full_name: "utsho-fleekbd/onecomm-api", updated_at: new Date().toISOString() },
+    latestRepo: {
+      full_name: "utsho-fleekbd/onecomm-api",
+      updated_at: new Date().toISOString(),
+    },
     contribution: {
       current: 0,
       longest: 0,
@@ -189,10 +203,12 @@ async function collectData() {
   const languages = new Map();
 
   for (const user of USERS) {
-    const profile = await fetchJson(`https://api.github.com/users/${encodeURIComponent(user)}`);
+    const profile = await fetchJson(
+      `https://api.github.com/users/${encodeURIComponent(user)}`,
+    );
     profiles.push(profile);
     const userRepos = await fetchAllPages(
-      `https://api.github.com/users/${encodeURIComponent(user)}/repos?per_page=100&type=owner&sort=updated`
+      `https://api.github.com/users/${encodeURIComponent(user)}/repos?per_page=100&type=owner&sort=updated`,
     );
 
     for (const repo of userRepos) {
@@ -201,33 +217,53 @@ async function collectData() {
       try {
         const repoLangs = await fetchJson(repo.languages_url);
         for (const [language, bytes] of Object.entries(repoLangs)) {
-          languages.set(language, (languages.get(language) || 0) + Number(bytes || 0));
+          languages.set(
+            language,
+            (languages.get(language) || 0) + Number(bytes || 0),
+          );
         }
       } catch (error) {
-        console.warn(`Could not fetch languages for ${repo.full_name}: ${error.message}`);
+        console.warn(
+          `Could not fetch languages for ${repo.full_name}: ${error.message}`,
+        );
       }
     }
   }
 
-  const languageTotal = [...languages.values()].reduce((sum, bytes) => sum + bytes, 0);
+  const languageTotal = [...languages.values()].reduce(
+    (sum, bytes) => sum + bytes,
+    0,
+  );
   const topLanguages = [...languages.entries()]
     .sort((a, b) => b[1] - a[1])
     .slice(0, 8)
     .map(([name, bytes]) => ({
       name,
       bytes,
-      pct: languageTotal ? Math.max(1, Math.round((bytes / languageTotal) * 100)) : 0,
+      pct: languageTotal
+        ? Math.max(1, Math.round((bytes / languageTotal) * 100))
+        : 0,
       color: PALETTE[name] || "#8B949E",
     }));
 
-  const latestRepo = repos.slice().sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))[0] || null;
+  const latestRepo =
+    repos
+      .slice()
+      .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))[0] ||
+    null;
   const contribution = await fetchContributionCalendar(PROFILE_USERNAME);
 
   return {
     profiles,
     repos,
-    totalStars: repos.reduce((sum, repo) => sum + Number(repo.stargazers_count || 0), 0),
-    totalForks: repos.reduce((sum, repo) => sum + Number(repo.forks_count || 0), 0),
+    totalStars: repos.reduce(
+      (sum, repo) => sum + Number(repo.stargazers_count || 0),
+      0,
+    ),
+    totalForks: repos.reduce(
+      (sum, repo) => sum + Number(repo.forks_count || 0),
+      0,
+    ),
     topLanguages,
     latestRepo,
     contribution: contribution || fallbackData().contribution,
@@ -254,9 +290,15 @@ function githubPulseSvg(data) {
   const publicRepos = data.repos.length;
   const spaces = USERS.length;
   const latest = data.latestRepo?.full_name || "No repo data";
-  const focus = data.topLanguages.slice(0, 4).map((lang) => lang.name).join(" · ") || "Backend · Systems · Rust";
+  const focus =
+    data.topLanguages
+      .slice(0, 4)
+      .map((lang) => lang.name)
+      .join(" · ") || "Backend · Systems · Rust";
   const subtitle = `${USERS.map((u) => `@${u}`).join(" + ")} · ${data.fallback ? "fallback" : "live"} local SVG · ${data.updated}`;
-  const note = data.fallback ? "Workflow will recalculate live repo metrics after the next run." : `Latest public update: ${latest}`;
+  const note = data.fallback
+    ? "Workflow will recalculate live repo metrics after the next run."
+    : `Latest public update: ${latest}`;
 
   return `<svg width="900" height="360" viewBox="0 0 900 360" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
 <title id="title">GitHub pulse for ${esc(PROFILE_USERNAME)}</title>
@@ -301,16 +343,18 @@ function metricCard(x, y, label, value, color, number) {
 
 function languagesSvg(data) {
   const langs = data.topLanguages.slice(0, 8);
-  const rows = langs.map((lang, index) => {
-    const y = 128 + index * 31;
-    const width = Math.max(8, Math.round(390 * lang.pct / 100));
-    return `<g font-family="Inter, Segoe UI, Arial, sans-serif">
+  const rows = langs
+    .map((lang, index) => {
+      const y = 128 + index * 31;
+      const width = Math.max(8, Math.round((390 * lang.pct) / 100));
+      return `<g font-family="Inter, Segoe UI, Arial, sans-serif">
       <text x="62" y="${y + 14}" fill="#D1D5DB" font-size="14" font-weight="800">${esc(lang.name)}</text>
       <text x="678" y="${y + 14}" fill="#9CA3AF" font-size="12" text-anchor="end">${lang.pct}%</text>
       <rect x="190" y="${y}" width="445" height="15" rx="8" fill="#202A3F"/>
       <rect x="190" y="${y}" width="${width}" height="15" rx="8" fill="${esc(lang.color)}"><animate attributeName="width" from="0" to="${width}" dur="${0.7 + index * 0.08}s" fill="freeze"/></rect>
     </g>`;
-  }).join("\n");
+    })
+    .join("\n");
 
   const summary = `${USERS.map((u) => `@${u}`).join(" + ")} · ${data.fallback ? "fallback" : "live"} language bytes · ${data.updated}`;
   return `<svg width="760" height="420" viewBox="0 0 760 420" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
@@ -401,8 +445,16 @@ async function main() {
   const pulse = githubPulseSvg(data);
   await writeFile(path.join(OUT_DIR, "github-pulse.svg"), pulse, "utf8");
   await writeFile(path.join(OUT_DIR, "github-stats.svg"), pulse, "utf8"); // compatibility alias
-  await writeFile(path.join(OUT_DIR, "top-languages.svg"), languagesSvg(data), "utf8");
-  await writeFile(path.join(OUT_DIR, "streak-card.svg"), streakSvg(data), "utf8");
+  await writeFile(
+    path.join(OUT_DIR, "top-languages.svg"),
+    languagesSvg(data),
+    "utf8",
+  );
+  await writeFile(
+    path.join(OUT_DIR, "streak-card.svg"),
+    streakSvg(data),
+    "utf8",
+  );
   console.log(`Generated animated profile cards for ${USERS.join(", ")}`);
 }
 

@@ -128,8 +128,8 @@ const utsho = {
 </p>
 
 <p align="center">
-  <img width="49%" src="./assets/top-languages.svg" alt="Top languages card" />
-  <img width="49%" src="./assets/streak-card.svg" alt="GitHub streak card" />
+  <img width="80%" src="./assets/top-languages.svg" alt="Top languages card" />
+  <img width="80%" src="./assets/streak-card.svg" alt="GitHub streak card" />
 </p>
 
 <!--
