@@ -1,0 +1,40 @@
+name: Update profile cards
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 18 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  update-profile-cards:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout profile README repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Generate animated SVG cards
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PROFILE_USERNAME: utshomh
+          EXTRA_GITHUB_USERS: utshowmh,utsho-fleekbd
+        run: node scripts/update_profile_cards.mjs
+
+      - name: Commit updated cards
+        run: |
+          if git diff --quiet -- assets; then
+            echo "No profile card changes."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets
+          git commit -m "chore: refresh animated profile cards"
+          git push
