@@ -25,12 +25,12 @@
 <rect x="28" y="28" width="704" height="364" rx="26" fill="#0D1117" fill-opacity="0.78" stroke="#273550" filter="url(#shadow)"/>
 <g font-family="Inter, Segoe UI, Arial, sans-serif">
   <text x="56" y="73" fill="#E6EDF3" font-size="30" font-weight="900">Top language mix</text>
-  <text x="58" y="101" fill="#9CA3AF" font-family="Fira Code, Consolas, monospace" font-size="13">@utshomh + @utshowmh + @utsho-fleekbd · live language bytes · May 31, 2026</text>
+  <text x="58" y="101" fill="#9CA3AF" font-family="Fira Code, Consolas, monospace" font-size="13">@utshomh + @utshowmh + @utsho-fleekbd · live language bytes · Jun 01, 2026</text>
   <g font-family="Inter, Segoe UI, Arial, sans-serif">
       <text x="62" y="142" fill="#D1D5DB" font-size="14" font-weight="800">TypeScript</text>
-      <text x="678" y="142" fill="#9CA3AF" font-size="12" text-anchor="end">64%</text>
+      <text x="678" y="142" fill="#9CA3AF" font-size="12" text-anchor="end">63%</text>
       <rect x="190" y="128" width="445" height="15" rx="8" fill="#202A3F"/>
-      <rect x="190" y="128" width="250" height="15" rx="8" fill="#3178C6"><animate attributeName="width" from="0" to="250" dur="0.7s" fill="freeze"/></rect>
+      <rect x="190" y="128" width="246" height="15" rx="8" fill="#3178C6"><animate attributeName="width" from="0" to="246" dur="0.7s" fill="freeze"/></rect>
     </g>
 <g font-family="Inter, Segoe UI, Arial, sans-serif">
       <text x="62" y="173" fill="#D1D5DB" font-size="14" font-weight="800">JavaScript</text>
