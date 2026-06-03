@@ -1,111 +1,61 @@
-<svg width="760" height="520" viewBox="0 0 760 520" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="streak-title streak-desc">
-<title id="streak-title">GitHub streak for utshomh</title>
-<desc id="streak-desc">Animated local SVG streak card generated from the GitHub contribution calendar.</desc>
+<svg width="760" height="420" viewBox="0 0 760 420" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+<title id="title">GitHub streak for utshomh</title>
+<desc id="desc">Animated local SVG streak card generated from the GitHub contribution calendar.</desc>
 <defs>
-  <clipPath id="streak-outerClip"><rect width="760" height="520" rx="34"/></clipPath>
-  <clipPath id="streak-panelClip"><rect x="24" y="24" width="712" height="472" rx="30"/></clipPath>
-  <linearGradient id="streak-bg" x1="0" y1="0" x2="760" y2="520" gradientUnits="userSpaceOnUse"><stop stop-color="#07101F"/><stop offset="0.48" stop-color="#101B36"/><stop offset="1" stop-color="#27113F"/></linearGradient>
-  <linearGradient id="streak-neon" x1="42" y1="20" x2="718" y2="500" gradientUnits="userSpaceOnUse"><stop stop-color="#22D3EE"/><stop offset="0.45" stop-color="#7C3AED"/><stop offset="1" stop-color="#00FF88"/></linearGradient>
-  <linearGradient id="streak-fire" x1="90" y1="40" x2="670" y2="480" gradientUnits="userSpaceOnUse"><stop stop-color="#FBBF24"/><stop offset="0.48" stop-color="#FF6B6B"/><stop offset="1" stop-color="#A855F7"/></linearGradient>
-  <linearGradient id="streak-glass" x1="24" y1="24" x2="736" y2="496" gradientUnits="userSpaceOnUse"><stop stop-color="#111827" stop-opacity="0.96"/><stop offset="1" stop-color="#0B1020" stop-opacity="0.92"/></linearGradient>
-  <linearGradient id="streak-shine" x1="0" y1="0" x2="180" y2="0" gradientUnits="userSpaceOnUse"><stop stop-color="#FFFFFF" stop-opacity="0"/><stop offset="0.5" stop-color="#FFFFFF" stop-opacity="0.45"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></linearGradient>
-  <filter id="streak-shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#000000" flood-opacity="0.48"/></filter>
-  <filter id="streak-glow"><feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-  
+  <linearGradient id="bg" x1="0" y1="0" x2="760" y2="420" gradientUnits="userSpaceOnUse"><stop stop-color="#0A1020"/><stop offset="0.48" stop-color="#16142D"/><stop offset="1" stop-color="#2B1035"/></linearGradient>
+  <linearGradient id="fire" x1="150" y1="60" x2="650" y2="360" gradientUnits="userSpaceOnUse"><stop stop-color="#FBBF24"/><stop offset="0.45" stop-color="#FF6B6B"/><stop offset="1" stop-color="#A855F7"/></linearGradient>
+  <linearGradient id="aqua" x1="0" y1="0" x2="760" y2="420" gradientUnits="userSpaceOnUse"><stop stop-color="#22D3EE"/><stop offset="1" stop-color="#00FF88"/></linearGradient>
+  <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#000000" flood-opacity="0.45"/></filter>
+  <filter id="glow"><feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
 </defs>
 
 <style>
-  * { box-sizing: border-box; }
-  .font { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; }
-  .mono { font-family: "Fira Code", "SFMono-Regular", Consolas, "Liberation Mono", monospace; }
-  .float { animation: float 7s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
-  .float2 { animation: float 9s ease-in-out infinite reverse; transform-origin: center; transform-box: fill-box; }
-  .pulse { animation: pulse 2.4s ease-in-out infinite; }
-  .twinkle { animation: twinkle 2.8s ease-in-out infinite; }
-  .dash { stroke-dasharray: 14 18; animation: dash 18s linear infinite; }
-  .draw { stroke-dasharray: 780; stroke-dashoffset: 780; animation: draw 2.4s ease-out forwards, dash 16s linear infinite 2.4s; }
-  .fadeUp { animation: fadeUp .82s cubic-bezier(.2,.8,.2,1) both; }
-  .delay1 { animation-delay: .08s; }
-  .delay2 { animation-delay: .16s; }
-  .delay3 { animation-delay: .24s; }
-  .delay4 { animation-delay: .32s; }
-  .delay5 { animation-delay: .40s; }
-  .delay6 { animation-delay: .48s; }
-  .delay7 { animation-delay: .56s; }
-  .scan { animation: scan 4.8s ease-in-out infinite; }
-  .barGlow { animation: glowPulse 3.4s ease-in-out infinite; }
-  .tilt { animation: tilt 10s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
-  @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
-  @keyframes pulse { 0%,100% { opacity: .32; transform: scale(.94); } 50% { opacity: 1; transform: scale(1.08); } }
-  @keyframes twinkle { 0%,100% { opacity: .25; } 45% { opacity: .95; } }
-  @keyframes dash { to { stroke-dashoffset: -280; } }
-  @keyframes draw { to { stroke-dashoffset: 0; } }
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(12px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
-  @keyframes scan { 0% { transform: translateX(-240px); opacity: 0; } 14% { opacity: .28; } 54% { opacity: .12; } 100% { transform: translateX(980px); opacity: 0; } }
-  @keyframes glowPulse { 0%,100% { opacity: .66; } 50% { opacity: 1; } }
-  @keyframes tilt { 0%,100% { transform: rotate(-1deg); } 50% { transform: rotate(1.2deg); } }
-  @media (prefers-reduced-motion: reduce) {
-    .float, .float2, .pulse, .twinkle, .dash, .draw, .fadeUp, .scan, .barGlow, .tilt { animation: none !important; }
-  }
+  .float { animation: float 7s ease-in-out infinite; transform-origin: center; }
+  .float2 { animation: float 9s ease-in-out infinite reverse; transform-origin: center; }
+  .pulse { animation: pulse 2.6s ease-in-out infinite; }
+  .dash { stroke-dasharray: 12 16; animation: dash 16s linear infinite; }
+  .fadeIn { animation: fadeIn .9s ease-out both; }
+  @keyframes float { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+  @keyframes pulse { 0%,100% { opacity: .35; } 50% { opacity: 1; } }
+  @keyframes dash { to { stroke-dashoffset: -240; } }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  @media (prefers-reduced-motion: reduce) { .float, .float2, .pulse, .dash, .fadeIn { animation: none; } }
 </style>
-<g clip-path="url(#streak-outerClip)">
-  <rect width="760" height="520" rx="34" fill="url(#streak-bg)"/>
-<g clip-path="url(#streak-panelClip)">
-  <rect x="24" y="24" width="712" height="472" rx="30" fill="url(#streak-glass)" filter="url(#streak-shadow)"/>
-  <path class="tilt" d="M0 364C96 250 176 334 276 236C372 142 454 202 536 112C620 20 690 74 760 34V520H0V364Z" fill="url(#streak-fire)" opacity="0.22"/>
-  <circle class="float" cx="650" cy="88" r="96" fill="#22D3EE" opacity="0.11"/>
-  <circle class="float2" cx="116" cy="448" r="122" fill="#A855F7" opacity="0.12"/>
-  <rect class="scan" x="-260" y="24" width="180" height="472" fill="url(#streak-shine)" opacity="0.24" transform="skewX(-18)"/>
-  <g opacity="0.5">
-    <circle class="twinkle" style="animation-delay:0.00s" cx="78" cy="132" r="2" fill="#22D3EE"/>
-<circle class="twinkle" style="animation-delay:0.37s" cx="678" cy="150" r="1.8" fill="#00FF88"/>
-<circle class="twinkle" style="animation-delay:0.74s" cx="592" cy="426" r="2.4" fill="#22D3EE"/>
-<circle class="twinkle" style="animation-delay:1.11s" cx="158" cy="382" r="1.7" fill="#00FF88"/>
-<circle class="twinkle" style="animation-delay:1.48s" cx="365" cy="78" r="1.6" fill="#22D3EE"/>
-<circle class="twinkle" style="animation-delay:1.85s" cx="426" cy="456" r="2" fill="#00FF88"/>
+<rect width="760" height="420" rx="30" fill="url(#bg)"/>
+<circle class="float" cx="176" cy="224" r="118" fill="#FBBF24" opacity="0.08"/>
+<circle class="float2" cx="620" cy="96" r="102" fill="#22D3EE" opacity="0.10"/>
+<path d="M0 304C95 206 174 280 271 203C369 126 444 172 525 105C613 32 682 61 760 22V420H0V304Z" fill="url(#fire)" opacity="0.17"/>
+<rect x="28" y="28" width="704" height="364" rx="26" fill="#0D1117" fill-opacity="0.78" stroke="#273550" filter="url(#shadow)"/>
+<g font-family="Inter, Segoe UI, Arial, sans-serif">
+  <text x="56" y="73" fill="#E6EDF3" font-size="30" font-weight="900">Streak engine</text>
+  <text x="58" y="101" fill="#9CA3AF" font-family="Fira Code, Consolas, monospace" font-size="13">utshomh contribution calendar · live streak card · Jun 03, 2026</text>
+  <g transform="translate(72 136)">
+    <circle cx="112" cy="112" r="92" stroke="#202A3F" stroke-width="18"/>
+    <circle class="dash" cx="112" cy="112" r="92" stroke="url(#fire)" stroke-width="18" stroke-linecap="round" fill="none" transform="rotate(-90 112 112)" filter="url(#glow)"/>
+    <text x="112" y="101" fill="#FBBF24" font-size="54" font-weight="900" text-anchor="middle">16</text>
+    <text x="112" y="130" fill="#C9D1D9" font-size="15" font-weight="800" text-anchor="middle">current streak</text>
+    <text x="112" y="151" fill="#8B949E" font-size="12" text-anchor="middle">days</text>
   </g>
-</g>
-<rect x="24" y="24" width="712" height="472" rx="30" stroke="#2B3856" stroke-opacity="0.95"/>
-<g class="font">
-  <text x="56" y="80" fill="#E6EDF3" font-size="32" font-weight="950">Streak engine</text>
-  <text class="mono" x="58" y="110" fill="#9CA3AF" font-size="13">utshomh contribution calendar · workflow-powered streak card · Jun 03, 2026</text>
-  <g class="fadeUp delay1" transform="translate(70 145)">
-    <circle cx="118" cy="118" r="96" stroke="#202A3F" stroke-width="19"/>
-    <circle class="dash" cx="118" cy="118" r="96" stroke="url(#streak-fire)" stroke-width="19" stroke-linecap="round" fill="none" transform="rotate(-90 118 118)" filter="url(#streak-glow)"/>
-    <circle class="pulse" cx="196" cy="50" r="8" fill="#FBBF24"/>
-    <text x="118" y="108" fill="#FBBF24" font-size="56" font-weight="950" text-anchor="middle">0</text>
-    <text x="118" y="139" fill="#C9D1D9" font-size="15" font-weight="850" text-anchor="middle">current streak</text>
-    <text x="118" y="161" fill="#8B949E" font-size="12" text-anchor="middle">days</text>
+  <g class="fadeIn">
+    <rect x="348" y="150" width="158" height="72" rx="18" fill="#121A2A" stroke="#2A3753"/>
+    <text x="366" y="177" fill="#8B949E" font-size="11" font-weight="800">LONGEST</text>
+    <text x="366" y="206" fill="#A855F7" font-size="23" font-weight="900">16 days</text>
   </g>
-  <g class="fadeUp delay2">
-  <rect x="350" y="154" width="160" height="82" rx="22" fill="#121A2A" stroke="#2A3753"/>
-  <path d="M366 223H494" stroke="#A855F7" stroke-width="3" stroke-linecap="round" opacity="0.54"/>
-  <text class="font" x="368" y="182" fill="#8B949E" font-size="11" font-weight="800" letter-spacing="0.8">LONGEST</text>
-  <text class="font" x="368" y="212" fill="#A855F7" font-size="23" font-weight="900">0 days</text>
-</g>
-  <g class="fadeUp delay3">
-  <rect x="532" y="154" width="160" height="82" rx="22" fill="#121A2A" stroke="#2A3753"/>
-  <path d="M548 223H676" stroke="#22D3EE" stroke-width="3" stroke-linecap="round" opacity="0.54"/>
-  <text class="font" x="550" y="182" fill="#8B949E" font-size="11" font-weight="800" letter-spacing="0.8">ACTIVE DAYS</text>
-  <text class="font" x="550" y="212" fill="#22D3EE" font-size="23" font-weight="900">0</text>
-</g>
-  <g class="fadeUp delay4">
-  <rect x="350" y="258" width="160" height="82" rx="22" fill="#121A2A" stroke="#2A3753"/>
-  <path d="M366 327H494" stroke="#00FF88" stroke-width="3" stroke-linecap="round" opacity="0.54"/>
-  <text class="font" x="368" y="286" fill="#8B949E" font-size="11" font-weight="800" letter-spacing="0.8">CONTRIBUTIONS</text>
-  <text class="font" x="368" y="316" fill="#00FF88" font-size="23" font-weight="900">0</text>
-</g>
-  <g class="fadeUp delay5">
-  <rect x="532" y="258" width="160" height="82" rx="22" fill="#121A2A" stroke="#2A3753"/>
-  <path d="M548 327H676" stroke="#FBBF24" stroke-width="3" stroke-linecap="round" opacity="0.54"/>
-  <text class="font" x="550" y="286" fill="#8B949E" font-size="11" font-weight="800" letter-spacing="0.8">LAST ACTIVE</text>
-  <text class="font" x="550" y="316" fill="#FBBF24" font-size="16" font-weight="900">after workflow …</text>
-</g>
-  <g class="fadeUp delay6">
-    <rect x="56" y="404" width="648" height="58" rx="22" fill="#111827" stroke="#303B55"/>
-    <text class="mono" x="78" y="438" fill="#8B949E" font-size="11">GraphQL powers live streaks in GitHub Actions; fallback still renders before the first tokenized run.</text>
+  <g class="fadeIn">
+    <rect x="536" y="150" width="158" height="72" rx="18" fill="#121A2A" stroke="#2A3753"/>
+    <text x="554" y="177" fill="#8B949E" font-size="11" font-weight="800">ACTIVE DAYS</text>
+    <text x="554" y="206" fill="#22D3EE" font-size="23" font-weight="900">90</text>
   </g>
+  <g class="fadeIn">
+    <rect x="348" y="244" width="158" height="72" rx="18" fill="#121A2A" stroke="#2A3753"/>
+    <text x="366" y="271" fill="#8B949E" font-size="11" font-weight="800">YEARLY CONTRIBUTIONS</text>
+    <text x="366" y="300" fill="#00FF88" font-size="23" font-weight="900">330</text>
+  </g>
+  <g class="fadeIn">
+    <rect x="536" y="244" width="158" height="72" rx="18" fill="#121A2A" stroke="#2A3753"/>
+    <text x="554" y="271" fill="#8B949E" font-size="11" font-weight="800">LAST ACTIVE</text>
+    <text x="554" y="300" fill="#FBBF24" font-size="12" font-weight="900">2026-06-03</text>
+  </g>
+  <text x="58" y="372" fill="#8B949E" font-family="Fira Code, Consolas, monospace" font-size="11">Uses GraphQL in GitHub Actions for live streaks; fallback SVG still renders beautifully before the first run.</text>
 </g>
-</g>
-<rect x="1" y="1" width="758" height="518" rx="33" stroke="#2D3A58" stroke-opacity="0.84"/>
 </svg>

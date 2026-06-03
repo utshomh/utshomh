@@ -1,119 +1,62 @@
-<svg width="760" height="520" viewBox="0 0 760 520" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="pulse-title pulse-desc">
-<title id="pulse-title">GitHub pulse for utshomh</title>
-<desc id="pulse-desc">Animated local SVG card with public GitHub profile statistics, clipped rounded backgrounds, and a mobile-safe stat grid.</desc>
+<svg width="900" height="360" viewBox="0 0 900 360" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+<title id="title">GitHub pulse for utshomh</title>
+<desc id="desc">Animated local SVG card with public GitHub profile statistics.</desc>
 <defs>
-  <clipPath id="pulse-outerClip"><rect width="760" height="520" rx="34"/></clipPath>
-  <clipPath id="pulse-panelClip"><rect x="24" y="24" width="712" height="472" rx="30"/></clipPath>
-  <linearGradient id="pulse-bg" x1="0" y1="0" x2="760" y2="520" gradientUnits="userSpaceOnUse"><stop stop-color="#07101F"/><stop offset="0.48" stop-color="#101B36"/><stop offset="1" stop-color="#27113F"/></linearGradient>
-  <linearGradient id="pulse-neon" x1="42" y1="20" x2="718" y2="500" gradientUnits="userSpaceOnUse"><stop stop-color="#22D3EE"/><stop offset="0.45" stop-color="#7C3AED"/><stop offset="1" stop-color="#00FF88"/></linearGradient>
-  <linearGradient id="pulse-fire" x1="90" y1="40" x2="670" y2="480" gradientUnits="userSpaceOnUse"><stop stop-color="#FBBF24"/><stop offset="0.48" stop-color="#FF6B6B"/><stop offset="1" stop-color="#A855F7"/></linearGradient>
-  <linearGradient id="pulse-glass" x1="24" y1="24" x2="736" y2="496" gradientUnits="userSpaceOnUse"><stop stop-color="#111827" stop-opacity="0.96"/><stop offset="1" stop-color="#0B1020" stop-opacity="0.92"/></linearGradient>
-  <linearGradient id="pulse-shine" x1="0" y1="0" x2="180" y2="0" gradientUnits="userSpaceOnUse"><stop stop-color="#FFFFFF" stop-opacity="0"/><stop offset="0.5" stop-color="#FFFFFF" stop-opacity="0.45"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></linearGradient>
-  <filter id="pulse-shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#000000" flood-opacity="0.48"/></filter>
-  <filter id="pulse-glow"><feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-  <linearGradient id="statGloss" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FFFFFF" stop-opacity="0.08"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></linearGradient>
+  <linearGradient id="bg" x1="0" y1="0" x2="900" y2="360" gradientUnits="userSpaceOnUse"><stop stop-color="#08111F"/><stop offset="0.52" stop-color="#101B36"/><stop offset="1" stop-color="#25103D"/></linearGradient>
+  <linearGradient id="neon" x1="70" y1="42" x2="830" y2="322" gradientUnits="userSpaceOnUse"><stop stop-color="#22D3EE"/><stop offset="0.52" stop-color="#7C3AED"/><stop offset="1" stop-color="#00FF88"/></linearGradient>
+  <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#000000" flood-opacity="0.45"/></filter>
+  <filter id="glow"><feGaussianBlur stdDeviation="5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
 </defs>
 
 <style>
-  * { box-sizing: border-box; }
-  .font { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; }
-  .mono { font-family: "Fira Code", "SFMono-Regular", Consolas, "Liberation Mono", monospace; }
-  .float { animation: float 7s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
-  .float2 { animation: float 9s ease-in-out infinite reverse; transform-origin: center; transform-box: fill-box; }
-  .pulse { animation: pulse 2.4s ease-in-out infinite; }
-  .twinkle { animation: twinkle 2.8s ease-in-out infinite; }
-  .dash { stroke-dasharray: 14 18; animation: dash 18s linear infinite; }
-  .draw { stroke-dasharray: 780; stroke-dashoffset: 780; animation: draw 2.4s ease-out forwards, dash 16s linear infinite 2.4s; }
-  .fadeUp { animation: fadeUp .82s cubic-bezier(.2,.8,.2,1) both; }
-  .delay1 { animation-delay: .08s; }
-  .delay2 { animation-delay: .16s; }
-  .delay3 { animation-delay: .24s; }
-  .delay4 { animation-delay: .32s; }
-  .delay5 { animation-delay: .40s; }
-  .delay6 { animation-delay: .48s; }
-  .delay7 { animation-delay: .56s; }
-  .scan { animation: scan 4.8s ease-in-out infinite; }
-  .barGlow { animation: glowPulse 3.4s ease-in-out infinite; }
-  .tilt { animation: tilt 10s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
-  @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
-  @keyframes pulse { 0%,100% { opacity: .32; transform: scale(.94); } 50% { opacity: 1; transform: scale(1.08); } }
-  @keyframes twinkle { 0%,100% { opacity: .25; } 45% { opacity: .95; } }
-  @keyframes dash { to { stroke-dashoffset: -280; } }
-  @keyframes draw { to { stroke-dashoffset: 0; } }
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(12px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
-  @keyframes scan { 0% { transform: translateX(-240px); opacity: 0; } 14% { opacity: .28; } 54% { opacity: .12; } 100% { transform: translateX(980px); opacity: 0; } }
-  @keyframes glowPulse { 0%,100% { opacity: .66; } 50% { opacity: 1; } }
-  @keyframes tilt { 0%,100% { transform: rotate(-1deg); } 50% { transform: rotate(1.2deg); } }
-  @media (prefers-reduced-motion: reduce) {
-    .float, .float2, .pulse, .twinkle, .dash, .draw, .fadeUp, .scan, .barGlow, .tilt { animation: none !important; }
-  }
+  .float { animation: float 7s ease-in-out infinite; transform-origin: center; }
+  .float2 { animation: float 9s ease-in-out infinite reverse; transform-origin: center; }
+  .pulse { animation: pulse 2.6s ease-in-out infinite; }
+  .dash { stroke-dasharray: 12 16; animation: dash 16s linear infinite; }
+  .fadeIn { animation: fadeIn .9s ease-out both; }
+  @keyframes float { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+  @keyframes pulse { 0%,100% { opacity: .35; } 50% { opacity: 1; } }
+  @keyframes dash { to { stroke-dashoffset: -240; } }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  @media (prefers-reduced-motion: reduce) { .float, .float2, .pulse, .dash, .fadeIn { animation: none; } }
 </style>
-<g clip-path="url(#pulse-outerClip)">
-  <rect width="760" height="520" rx="34" fill="url(#pulse-bg)"/>
-<g clip-path="url(#pulse-panelClip)">
-  <rect x="24" y="24" width="712" height="472" rx="30" fill="url(#pulse-glass)" filter="url(#pulse-shadow)"/>
-  <path class="tilt" d="M0 356C96 252 178 326 273 232C370 136 464 190 544 106C635 11 692 80 760 40V520H0V356Z" fill="url(#pulse-neon)" opacity="0.22"/>
-  <circle class="float" cx="650" cy="88" r="96" fill="#22D3EE" opacity="0.11"/>
-  <circle class="float2" cx="116" cy="448" r="122" fill="#A855F7" opacity="0.12"/>
-  <rect class="scan" x="-260" y="24" width="180" height="472" fill="url(#pulse-shine)" opacity="0.24" transform="skewX(-18)"/>
-  <g opacity="0.5">
-    <circle class="twinkle" style="animation-delay:0.00s" cx="78" cy="132" r="2" fill="#22D3EE"/>
-<circle class="twinkle" style="animation-delay:0.37s" cx="678" cy="150" r="1.8" fill="#00FF88"/>
-<circle class="twinkle" style="animation-delay:0.74s" cx="592" cy="426" r="2.4" fill="#22D3EE"/>
-<circle class="twinkle" style="animation-delay:1.11s" cx="158" cy="382" r="1.7" fill="#00FF88"/>
-<circle class="twinkle" style="animation-delay:1.48s" cx="365" cy="78" r="1.6" fill="#22D3EE"/>
-<circle class="twinkle" style="animation-delay:1.85s" cx="426" cy="456" r="2" fill="#00FF88"/>
+<rect width="900" height="360" rx="30" fill="url(#bg)"/>
+<circle class="float" cx="775" cy="78" r="82" fill="#22D3EE" opacity="0.10"/>
+<circle class="float2" cx="120" cy="305" r="110" fill="#A855F7" opacity="0.12"/>
+<path d="M0 251C107 141 189 221 295 128C398 37 510 86 604 45C725 -8 782 53 900 18V360H0V251Z" fill="url(#neon)" opacity="0.20"/>
+<rect x="28" y="28" width="844" height="304" rx="26" fill="#0D1117" fill-opacity="0.78" stroke="#273550" filter="url(#shadow)"/>
+<path class="dash" d="M66 275C148 195 194 255 272 190C342 132 409 153 468 111C547 55 620 120 683 82C756 38 792 91 837 63" stroke="url(#neon)" stroke-width="3" stroke-linecap="round" opacity="0.75" filter="url(#glow)"/>
+<g font-family="Inter, Segoe UI, Arial, sans-serif">
+  <text x="62" y="76" fill="#E6EDF3" font-size="33" font-weight="900">GitHub pulse</text>
+  <text x="64" y="104" fill="#9CA3AF" font-family="Fira Code, Consolas, monospace" font-size="14">@utshomh + @utshowmh + @utsho-fleekbd · live local SVG · Jun 03, 2026</text>
+  <g class="fadeIn">
+    <rect x="62" y="132" width="176" height="78" rx="18" fill="#121A2A" stroke="#2A3753"/>
+    <text x="80" y="159" fill="#8B949E" font-size="11" font-weight="800">PUBLIC REPOS</text>
+    <text x="80" y="192" fill="#22D3EE" font-size="31" font-weight="900">50</text>
+    <text x="204" y="162" fill="#26324A" font-size="23" font-weight="900">01</text>
   </g>
-</g>
-<rect x="24" y="24" width="712" height="472" rx="30" stroke="#2B3856" stroke-opacity="0.95"/>
-<path class="draw" d="M62 386C132 302 208 352 280 290C355 225 438 246 496 181C574 94 643 156 704 92" stroke="url(#pulse-neon)" stroke-width="4" stroke-linecap="round" opacity="0.82" filter="url(#pulse-glow)"/>
-<g class="font">
-  <text x="56" y="80" fill="#E6EDF3" font-size="34" font-weight="950">GitHub pulse</text>
-  <text class="mono" x="58" y="110" fill="#9CA3AF" font-size="13">@utshomh + @utshowmh + @mahadyhassanutsho + @utsho-fleekbd · fallback local S…</text>
-  <g class="fadeUp delay1">
-  <rect x="56" y="138" width="306" height="92" rx="22" fill="#121A2A" stroke="#2A3753"/>
-  <rect x="57" y="139" width="304" height="90" rx="21" fill="url(#statGloss)" opacity="0.26"/>
-  <path d="M74 216H344" stroke="#22D3EE" stroke-width="3" stroke-linecap="round" opacity="0.58"/>
-  <circle class="pulse" cx="338" cy="163" r="5" fill="#22D3EE"/>
-  <text class="font" x="76" y="168" fill="#8B949E" font-size="12" font-weight="800" letter-spacing="0.8">PUBLIC REPOS</text>
-  <text class="font" x="76" y="208" fill="#22D3EE" font-size="34" font-weight="900">53</text>
-  <text class="font" x="308" y="209" fill="#26324A" font-size="30" font-weight="900">01</text>
-</g>
-  <g class="fadeUp delay2">
-  <rect x="398" y="138" width="306" height="92" rx="22" fill="#121A2A" stroke="#2A3753"/>
-  <rect x="399" y="139" width="304" height="90" rx="21" fill="url(#statGloss)" opacity="0.26"/>
-  <path d="M416 216H686" stroke="#A855F7" stroke-width="3" stroke-linecap="round" opacity="0.58"/>
-  <circle class="pulse" cx="680" cy="163" r="5" fill="#A855F7"/>
-  <text class="font" x="418" y="168" fill="#8B949E" font-size="12" font-weight="800" letter-spacing="0.8">TOTAL STARS</text>
-  <text class="font" x="418" y="208" fill="#A855F7" font-size="34" font-weight="900">22</text>
-  <text class="font" x="650" y="209" fill="#26324A" font-size="30" font-weight="900">02</text>
-</g>
-  <g class="fadeUp delay3">
-  <rect x="56" y="250" width="306" height="92" rx="22" fill="#121A2A" stroke="#2A3753"/>
-  <rect x="57" y="251" width="304" height="90" rx="21" fill="url(#statGloss)" opacity="0.26"/>
-  <path d="M74 328H344" stroke="#FBBF24" stroke-width="3" stroke-linecap="round" opacity="0.58"/>
-  <circle class="pulse" cx="338" cy="275" r="5" fill="#FBBF24"/>
-  <text class="font" x="76" y="280" fill="#8B949E" font-size="12" font-weight="800" letter-spacing="0.8">TOTAL FORKS</text>
-  <text class="font" x="76" y="320" fill="#FBBF24" font-size="34" font-weight="900">4</text>
-  <text class="font" x="308" y="321" fill="#26324A" font-size="30" font-weight="900">03</text>
-</g>
-  <g class="fadeUp delay4">
-  <rect x="398" y="250" width="306" height="92" rx="22" fill="#121A2A" stroke="#2A3753"/>
-  <rect x="399" y="251" width="304" height="90" rx="21" fill="url(#statGloss)" opacity="0.26"/>
-  <path d="M416 328H686" stroke="#00FF88" stroke-width="3" stroke-linecap="round" opacity="0.58"/>
-  <circle class="pulse" cx="680" cy="275" r="5" fill="#00FF88"/>
-  <text class="font" x="418" y="280" fill="#8B949E" font-size="12" font-weight="800" letter-spacing="0.8">GITHUB SPACES</text>
-  <text class="font" x="418" y="320" fill="#00FF88" font-size="34" font-weight="900">4</text>
-  <text class="font" x="650" y="321" fill="#26324A" font-size="30" font-weight="900">04</text>
-</g>
-  <g class="fadeUp delay5">
-    <rect x="56" y="370" width="648" height="94" rx="24" fill="#111827" stroke="#303B55"/>
-    <circle class="pulse" cx="84" cy="405" r="7" fill="#00FF88"/>
-    <text x="106" y="401" fill="#C9D1D9" font-size="13" font-weight="900" letter-spacing="1">SHIP MODE</text>
-    <text x="106" y="426" fill="#E6EDF3" font-size="17" font-weight="800">TypeScript · JavaScript · Rust · Shell · backend APIs · VPS/server work</text>
-    <text class="mono" x="106" y="447" fill="#8B949E" font-size="11">Workflow will recalculate live repo metrics after the next run.</text>
+  <g class="fadeIn">
+    <rect x="268" y="132" width="176" height="78" rx="18" fill="#121A2A" stroke="#2A3753"/>
+    <text x="286" y="159" fill="#8B949E" font-size="11" font-weight="800">TOTAL STARS</text>
+    <text x="286" y="192" fill="#A855F7" font-size="31" font-weight="900">25</text>
+    <text x="410" y="162" fill="#26324A" font-size="23" font-weight="900">02</text>
   </g>
+  <g class="fadeIn">
+    <rect x="474" y="132" width="176" height="78" rx="18" fill="#121A2A" stroke="#2A3753"/>
+    <text x="492" y="159" fill="#8B949E" font-size="11" font-weight="800">TOTAL FORKS</text>
+    <text x="492" y="192" fill="#FBBF24" font-size="31" font-weight="900">7</text>
+    <text x="616" y="162" fill="#26324A" font-size="23" font-weight="900">03</text>
+  </g>
+  <g class="fadeIn">
+    <rect x="680" y="132" width="176" height="78" rx="18" fill="#121A2A" stroke="#2A3753"/>
+    <text x="698" y="159" fill="#8B949E" font-size="11" font-weight="800">GITHUB SPACES</text>
+    <text x="698" y="192" fill="#00FF88" font-size="31" font-weight="900">3</text>
+    <text x="822" y="162" fill="#26324A" font-size="23" font-weight="900">04</text>
+  </g>
+  <rect x="62" y="232" width="776" height="78" rx="18" fill="#111827" stroke="#303B55"/>
+  <circle class="pulse" cx="88" cy="264" r="7" fill="#00FF88"/>
+  <text x="108" y="259" fill="#C9D1D9" font-size="13" font-weight="800">SHIP MODE</text>
+  <text x="108" y="281" fill="#E6EDF3" font-size="16" font-weight="700">TypeScript · JavaScript · Rust · CSS · backend APIs · VPS/server work · language tooling</text>
+  <text x="108" y="301" fill="#8B949E" font-size="11">Latest public update: utshomh/utshomh</text>
 </g>
-</g>
-<rect x="1" y="1" width="758" height="518" rx="33" stroke="#2D3A58" stroke-opacity="0.84"/>
 </svg>
