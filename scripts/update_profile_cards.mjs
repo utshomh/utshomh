@@ -12,6 +12,7 @@ const USERS = [...new Set([PROFILE_USERNAME, ...EXTRA_GITHUB_USERS])];
 const TOKEN = process.env.GITHUB_TOKEN || process.env.GH_TOKEN || "";
 const OUT_DIR = process.env.PROFILE_CARD_OUT_DIR || "assets";
 const ALLOW_FALLBACK = process.env.ALLOW_FALLBACK !== "false";
+const WRITE_README_SNIPPET = process.env.WRITE_README_SNIPPET !== "false";
 
 const PALETTE = {
   TypeScript: "#3178C6",
@@ -26,6 +27,13 @@ const PALETTE = {
   Dockerfile: "#384D54",
   Vue: "#41B883",
   MDX: "#F9AC00",
+  Svelte: "#FF3E00",
+  PHP: "#4F5D95",
+  Java: "#B07219",
+  C: "#555555",
+  "C++": "#F34B7D",
+  CSharp: "#178600",
+  Ruby: "#701516",
 };
 
 function esc(value) {
@@ -37,8 +45,15 @@ function esc(value) {
     .replaceAll("'", "&apos;");
 }
 
+function trimText(value, max = 64) {
+  const text = String(value ?? "");
+  return text.length > max ? `${text.slice(0, Math.max(0, max - 1))}…` : text;
+}
+
 function fmtNumber(value) {
   const n = Number(value || 0);
+  if (n >= 1_000_000)
+    return `${(n / 1_000_000).toFixed(n >= 10_000_000 ? 0 : 1)}m`;
   if (n >= 1000) return `${(n / 1000).toFixed(n >= 10000 ? 0 : 1)}k`;
   return String(n);
 }
@@ -52,14 +67,19 @@ function todayUTC() {
   });
 }
 
-async function fetchJson(url) {
+function githubHeaders(extra = {}) {
   const headers = {
     Accept: "application/vnd.github+json",
     "X-GitHub-Api-Version": "2022-11-28",
     "User-Agent": `${PROFILE_USERNAME}-profile-readme-card-generator`,
+    ...extra,
   };
   if (TOKEN) headers.Authorization = `Bearer ${TOKEN}`;
-  const response = await fetch(url, { headers });
+  return headers;
+}
+
+async function fetchJson(url) {
+  const response = await fetch(url, { headers: githubHeaders() });
   if (!response.ok) {
     const body = await response.text();
     throw new Error(
@@ -73,13 +93,7 @@ async function fetchAllPages(firstUrl) {
   const results = [];
   let url = firstUrl;
   while (url) {
-    const headers = {
-      Accept: "application/vnd.github+json",
-      "X-GitHub-Api-Version": "2022-11-28",
-      "User-Agent": `${PROFILE_USERNAME}-profile-readme-card-generator`,
-    };
-    if (TOKEN) headers.Authorization = `Bearer ${TOKEN}`;
-    const response = await fetch(url, { headers });
+    const response = await fetch(url, { headers: githubHeaders() });
     if (!response.ok) {
       const body = await response.text();
       throw new Error(
@@ -114,11 +128,7 @@ async function fetchContributionCalendar(login) {
   `;
   const response = await fetch("https://api.github.com/graphql", {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${TOKEN}`,
-      "Content-Type": "application/json",
-      "User-Agent": `${PROFILE_USERNAME}-profile-readme-card-generator`,
-    },
+    headers: githubHeaders({ "Content-Type": "application/json" }),
     body: JSON.stringify({ query, variables: { login } }),
   });
   if (!response.ok) return null;
@@ -126,9 +136,11 @@ async function fetchContributionCalendar(login) {
   const calendar =
     json.data?.user?.contributionsCollection?.contributionCalendar;
   if (!calendar) return null;
+
   const days = calendar.weeks
     .flatMap((week) => week.contributionDays)
     .sort((a, b) => a.date.localeCompare(b.date));
+
   let longest = 0;
   let run = 0;
   for (const day of days) {
@@ -139,17 +151,21 @@ async function fetchContributionCalendar(login) {
       run = 0;
     }
   }
+
   let end = days.length - 1;
-  if (end >= 0 && days[end].contributionCount === 0) end -= 1; // don't punish an unfinished today
+  if (end >= 0 && days[end].contributionCount === 0) end -= 1;
+
   let current = 0;
   for (let i = end; i >= 0; i -= 1) {
     if (days[i].contributionCount > 0) current += 1;
     else break;
   }
+
   const activeDays = days.filter((day) => day.contributionCount > 0).length;
   const lastActive =
     [...days].reverse().find((day) => day.contributionCount > 0)?.date ||
     "No activity yet";
+
   return {
     current,
     longest,
@@ -197,6 +213,39 @@ function fallbackData(errorMessage = "") {
   };
 }
 
+function normalizeLanguagePercents(entries, totalBytes) {
+  if (!entries.length || !totalBytes) return [];
+
+  const raw = entries.map(([name, bytes]) => ({
+    name,
+    bytes,
+    exact: (bytes / totalBytes) * 100,
+  }));
+  const rounded = raw.map((lang) => ({
+    ...lang,
+    pct: Math.max(1, Math.floor(lang.exact)),
+  }));
+
+  let remainder = Math.max(
+    0,
+    100 - rounded.reduce((sum, lang) => sum + lang.pct, 0),
+  );
+  for (const lang of rounded.sort((a, b) => (b.exact % 1) - (a.exact % 1))) {
+    if (remainder <= 0) break;
+    lang.pct += 1;
+    remainder -= 1;
+  }
+
+  return rounded
+    .sort((a, b) => b.bytes - a.bytes)
+    .map(({ name, bytes, pct }) => ({
+      name,
+      bytes,
+      pct,
+      color: PALETTE[name] || "#8B949E",
+    }));
+}
+
 async function collectData() {
   const profiles = [];
   const repos = [];
@@ -234,17 +283,10 @@ async function collectData() {
     (sum, bytes) => sum + bytes,
     0,
   );
-  const topLanguages = [...languages.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 8)
-    .map(([name, bytes]) => ({
-      name,
-      bytes,
-      pct: languageTotal
-        ? Math.max(1, Math.round((bytes / languageTotal) * 100))
-        : 0,
-      color: PALETTE[name] || "#8B949E",
-    }));
+  const topLanguages = normalizeLanguagePercents(
+    [...languages.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8),
+    languageTotal,
+  );
 
   const latestRepo =
     repos
@@ -274,161 +316,300 @@ async function collectData() {
 
 const animatedStyle = `
 <style>
-  .float { animation: float 7s ease-in-out infinite; transform-origin: center; }
-  .float2 { animation: float 9s ease-in-out infinite reverse; transform-origin: center; }
-  .pulse { animation: pulse 2.6s ease-in-out infinite; }
-  .dash { stroke-dasharray: 12 16; animation: dash 16s linear infinite; }
-  .fadeIn { animation: fadeIn .9s ease-out both; }
-  @keyframes float { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
-  @keyframes pulse { 0%,100% { opacity: .35; } 50% { opacity: 1; } }
-  @keyframes dash { to { stroke-dashoffset: -240; } }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-  @media (prefers-reduced-motion: reduce) { .float, .float2, .pulse, .dash, .fadeIn { animation: none; } }
+  * { box-sizing: border-box; }
+  .font { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; }
+  .mono { font-family: "Fira Code", "SFMono-Regular", Consolas, "Liberation Mono", monospace; }
+  .float { animation: float 7s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
+  .float2 { animation: float 9s ease-in-out infinite reverse; transform-origin: center; transform-box: fill-box; }
+  .pulse { animation: pulse 2.4s ease-in-out infinite; }
+  .twinkle { animation: twinkle 2.8s ease-in-out infinite; }
+  .dash { stroke-dasharray: 14 18; animation: dash 18s linear infinite; }
+  .draw { stroke-dasharray: 780; stroke-dashoffset: 780; animation: draw 2.4s ease-out forwards, dash 16s linear infinite 2.4s; }
+  .fadeUp { animation: fadeUp .82s cubic-bezier(.2,.8,.2,1) both; }
+  .delay1 { animation-delay: .08s; }
+  .delay2 { animation-delay: .16s; }
+  .delay3 { animation-delay: .24s; }
+  .delay4 { animation-delay: .32s; }
+  .delay5 { animation-delay: .40s; }
+  .delay6 { animation-delay: .48s; }
+  .delay7 { animation-delay: .56s; }
+  .scan { animation: scan 4.8s ease-in-out infinite; }
+  .barGlow { animation: glowPulse 3.4s ease-in-out infinite; }
+  .tilt { animation: tilt 10s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
+  @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+  @keyframes pulse { 0%,100% { opacity: .32; transform: scale(.94); } 50% { opacity: 1; transform: scale(1.08); } }
+  @keyframes twinkle { 0%,100% { opacity: .25; } 45% { opacity: .95; } }
+  @keyframes dash { to { stroke-dashoffset: -280; } }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(12px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
+  @keyframes scan { 0% { transform: translateX(-240px); opacity: 0; } 14% { opacity: .28; } 54% { opacity: .12; } 100% { transform: translateX(980px); opacity: 0; } }
+  @keyframes glowPulse { 0%,100% { opacity: .66; } 50% { opacity: 1; } }
+  @keyframes tilt { 0%,100% { transform: rotate(-1deg); } 50% { transform: rotate(1.2deg); } }
+  @media (prefers-reduced-motion: reduce) {
+    .float, .float2, .pulse, .twinkle, .dash, .draw, .fadeUp, .scan, .barGlow, .tilt { animation: none !important; }
+  }
 </style>`;
 
+function svgShell({
+  id,
+  width,
+  height,
+  title,
+  desc,
+  children,
+  extraDefs = "",
+}) {
+  return `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="${id}-title ${id}-desc">
+<title id="${id}-title">${esc(title)}</title>
+<desc id="${id}-desc">${esc(desc)}</desc>
+<defs>
+  <clipPath id="${id}-outerClip"><rect width="${width}" height="${height}" rx="34"/></clipPath>
+  <clipPath id="${id}-panelClip"><rect x="24" y="24" width="${width - 48}" height="${height - 48}" rx="30"/></clipPath>
+  <linearGradient id="${id}-bg" x1="0" y1="0" x2="${width}" y2="${height}" gradientUnits="userSpaceOnUse"><stop stop-color="#07101F"/><stop offset="0.48" stop-color="#101B36"/><stop offset="1" stop-color="#27113F"/></linearGradient>
+  <linearGradient id="${id}-neon" x1="42" y1="20" x2="${width - 42}" y2="${height - 20}" gradientUnits="userSpaceOnUse"><stop stop-color="#22D3EE"/><stop offset="0.45" stop-color="#7C3AED"/><stop offset="1" stop-color="#00FF88"/></linearGradient>
+  <linearGradient id="${id}-fire" x1="90" y1="40" x2="${width - 90}" y2="${height - 40}" gradientUnits="userSpaceOnUse"><stop stop-color="#FBBF24"/><stop offset="0.48" stop-color="#FF6B6B"/><stop offset="1" stop-color="#A855F7"/></linearGradient>
+  <linearGradient id="${id}-glass" x1="24" y1="24" x2="${width - 24}" y2="${height - 24}" gradientUnits="userSpaceOnUse"><stop stop-color="#111827" stop-opacity="0.96"/><stop offset="1" stop-color="#0B1020" stop-opacity="0.92"/></linearGradient>
+  <linearGradient id="${id}-shine" x1="0" y1="0" x2="180" y2="0" gradientUnits="userSpaceOnUse"><stop stop-color="#FFFFFF" stop-opacity="0"/><stop offset="0.5" stop-color="#FFFFFF" stop-opacity="0.45"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></linearGradient>
+  <filter id="${id}-shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#000000" flood-opacity="0.48"/></filter>
+  <filter id="${id}-glow"><feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  ${extraDefs}
+</defs>
+${animatedStyle}
+<g clip-path="url(#${id}-outerClip)">
+  ${children}
+</g>
+<rect x="1" y="1" width="${width - 2}" height="${height - 2}" rx="33" stroke="#2D3A58" stroke-opacity="0.84"/>
+</svg>`;
+}
+
+function panel(id, width, height, meshPath, accent = "neon") {
+  const gradient = accent === "fire" ? `${id}-fire` : `${id}-neon`;
+  return `<rect width="${width}" height="${height}" rx="34" fill="url(#${id}-bg)"/>
+<g clip-path="url(#${id}-panelClip)">
+  <rect x="24" y="24" width="${width - 48}" height="${height - 48}" rx="30" fill="url(#${id}-glass)" filter="url(#${id}-shadow)"/>
+  <path class="tilt" d="${meshPath}" fill="url(#${gradient})" opacity="0.22"/>
+  <circle class="float" cx="${width - 110}" cy="88" r="96" fill="#22D3EE" opacity="0.11"/>
+  <circle class="float2" cx="116" cy="${height - 72}" r="122" fill="#A855F7" opacity="0.12"/>
+  <rect class="scan" x="-260" y="24" width="180" height="${height - 48}" fill="url(#${id}-shine)" opacity="0.24" transform="skewX(-18)"/>
+  <g opacity="0.5">
+    ${sparkles(id, width, height)}
+  </g>
+</g>
+<rect x="24" y="24" width="${width - 48}" height="${height - 48}" rx="30" stroke="#2B3856" stroke-opacity="0.95"/>`;
+}
+
+function sparkles(id, width, height) {
+  const points = [
+    [78, 132, 2.0],
+    [width - 82, 150, 1.8],
+    [width - 168, height - 94, 2.4],
+    [158, height - 138, 1.7],
+    [width * 0.48, 78, 1.6],
+    [width * 0.56, height - 64, 2.0],
+  ];
+  return points
+    .map(
+      ([cx, cy, r], i) =>
+        `<circle class="twinkle" style="animation-delay:${(i * 0.37).toFixed(2)}s" cx="${Math.round(cx)}" cy="${Math.round(cy)}" r="${r}" fill="${i % 2 ? "#00FF88" : "#22D3EE"}"/>`,
+    )
+    .join("\n");
+}
+
+function metricCard({ x, y, w, h, label, value, color, number, delay = 0 }) {
+  const delayClass = `delay${Math.min(7, Math.max(0, delay))}`;
+  return `<g class="fadeUp ${delayClass}">
+  <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="22" fill="#121A2A" stroke="#2A3753"/>
+  <rect x="${x + 1}" y="${y + 1}" width="${w - 2}" height="${h - 2}" rx="21" fill="url(#statGloss)" opacity="0.26"/>
+  <path d="M${x + 18} ${y + h - 14}H${x + w - 18}" stroke="${color}" stroke-width="3" stroke-linecap="round" opacity="0.58"/>
+  <circle class="pulse" cx="${x + w - 24}" cy="${y + 25}" r="5" fill="${color}"/>
+  <text class="font" x="${x + 20}" y="${y + 30}" fill="#8B949E" font-size="12" font-weight="800" letter-spacing="0.8">${esc(label)}</text>
+  <text class="font" x="${x + 20}" y="${y + 70}" fill="${color}" font-size="34" font-weight="900">${esc(value)}</text>
+  <text class="font" x="${x + w - 54}" y="${y + 71}" fill="#26324A" font-size="30" font-weight="900">${esc(number)}</text>
+</g>`;
+}
+
+function smallStat({
+  x,
+  y,
+  w = 158,
+  h = 76,
+  label,
+  value,
+  color,
+  valueSize = 23,
+  delay = 0,
+}) {
+  const delayClass = `delay${Math.min(7, Math.max(0, delay))}`;
+  return `<g class="fadeUp ${delayClass}">
+  <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="22" fill="#121A2A" stroke="#2A3753"/>
+  <path d="M${x + 16} ${y + h - 13}H${x + w - 16}" stroke="${color}" stroke-width="3" stroke-linecap="round" opacity="0.54"/>
+  <text class="font" x="${x + 18}" y="${y + 28}" fill="#8B949E" font-size="11" font-weight="800" letter-spacing="0.8">${esc(label)}</text>
+  <text class="font" x="${x + 18}" y="${y + 58}" fill="${color}" font-size="${valueSize}" font-weight="900">${esc(value)}</text>
+</g>`;
+}
+
 function githubPulseSvg(data) {
+  const id = "pulse";
+  const width = 760;
+  const height = 520;
   const publicRepos = data.repos.length;
   const spaces = USERS.length;
-  const latest = data.latestRepo?.full_name || "No repo data";
-  const focus =
+  const latest = trimText(data.latestRepo?.full_name || "No repo data", 52);
+  const focus = trimText(
     data.topLanguages
       .slice(0, 4)
       .map((lang) => lang.name)
-      .join(" · ") || "Backend · Systems · Rust";
-  const subtitle = `${USERS.map((u) => `@${u}`).join(" + ")} · ${data.fallback ? "fallback" : "live"} local SVG · ${data.updated}`;
+      .join(" · ") || "Backend · Systems · Rust",
+    50,
+  );
+  const subtitle = trimText(
+    `${USERS.map((u) => `@${u}`).join(" + ")} · ${data.fallback ? "fallback" : "live"} local SVG · ${data.updated}`,
+    78,
+  );
   const note = data.fallback
     ? "Workflow will recalculate live repo metrics after the next run."
     : `Latest public update: ${latest}`;
 
-  return `<svg width="900" height="360" viewBox="0 0 900 360" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
-<title id="title">GitHub pulse for ${esc(PROFILE_USERNAME)}</title>
-<desc id="desc">Animated local SVG card with public GitHub profile statistics.</desc>
-<defs>
-  <linearGradient id="bg" x1="0" y1="0" x2="900" y2="360" gradientUnits="userSpaceOnUse"><stop stop-color="#08111F"/><stop offset="0.52" stop-color="#101B36"/><stop offset="1" stop-color="#25103D"/></linearGradient>
-  <linearGradient id="neon" x1="70" y1="42" x2="830" y2="322" gradientUnits="userSpaceOnUse"><stop stop-color="#22D3EE"/><stop offset="0.52" stop-color="#7C3AED"/><stop offset="1" stop-color="#00FF88"/></linearGradient>
-  <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#000000" flood-opacity="0.45"/></filter>
-  <filter id="glow"><feGaussianBlur stdDeviation="5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-</defs>
-${animatedStyle}
-<rect width="900" height="360" rx="30" fill="url(#bg)"/>
-<circle class="float" cx="775" cy="78" r="82" fill="#22D3EE" opacity="0.10"/>
-<circle class="float2" cx="120" cy="305" r="110" fill="#A855F7" opacity="0.12"/>
-<path d="M0 251C107 141 189 221 295 128C398 37 510 86 604 45C725 -8 782 53 900 18V360H0V251Z" fill="url(#neon)" opacity="0.20"/>
-<rect x="28" y="28" width="844" height="304" rx="26" fill="#0D1117" fill-opacity="0.78" stroke="#273550" filter="url(#shadow)"/>
-<path class="dash" d="M66 275C148 195 194 255 272 190C342 132 409 153 468 111C547 55 620 120 683 82C756 38 792 91 837 63" stroke="url(#neon)" stroke-width="3" stroke-linecap="round" opacity="0.75" filter="url(#glow)"/>
-<g font-family="Inter, Segoe UI, Arial, sans-serif">
-  <text x="62" y="76" fill="#E6EDF3" font-size="33" font-weight="900">GitHub pulse</text>
-  <text x="64" y="104" fill="#9CA3AF" font-family="Fira Code, Consolas, monospace" font-size="14">${esc(subtitle)}</text>
-  ${metricCard(62, 132, "PUBLIC REPOS", fmtNumber(publicRepos), "#22D3EE", "01")}
-  ${metricCard(268, 132, "TOTAL STARS", fmtNumber(data.totalStars), "#A855F7", "02")}
-  ${metricCard(474, 132, "TOTAL FORKS", fmtNumber(data.totalForks), "#FBBF24", "03")}
-  ${metricCard(680, 132, "GITHUB SPACES", fmtNumber(spaces), "#00FF88", "04")}
-  <rect x="62" y="232" width="776" height="78" rx="18" fill="#111827" stroke="#303B55"/>
-  <circle class="pulse" cx="88" cy="264" r="7" fill="#00FF88"/>
-  <text x="108" y="259" fill="#C9D1D9" font-size="13" font-weight="800">SHIP MODE</text>
-  <text x="108" y="281" fill="#E6EDF3" font-size="16" font-weight="700">${esc(focus)} · backend APIs · VPS/server work · language tooling</text>
-  <text x="108" y="301" fill="#8B949E" font-size="11">${esc(note)}</text>
-</g>
-</svg>`;
+  const extraDefs = `<linearGradient id="statGloss" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FFFFFF" stop-opacity="0.08"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></linearGradient>`;
+  const mesh = `M0 356C96 252 178 326 273 232C370 136 464 190 544 106C635 11 692 80 760 40V520H0V356Z`;
+
+  const children = `${panel(id, width, height, mesh)}
+<path class="draw" d="M62 386C132 302 208 352 280 290C355 225 438 246 496 181C574 94 643 156 704 92" stroke="url(#${id}-neon)" stroke-width="4" stroke-linecap="round" opacity="0.82" filter="url(#${id}-glow)"/>
+<g class="font">
+  <text x="56" y="80" fill="#E6EDF3" font-size="34" font-weight="950">GitHub pulse</text>
+  <text class="mono" x="58" y="110" fill="#9CA3AF" font-size="13">${esc(subtitle)}</text>
+  ${metricCard({ x: 56, y: 138, w: 306, h: 92, label: "PUBLIC REPOS", value: fmtNumber(publicRepos), color: "#22D3EE", number: "01", delay: 1 })}
+  ${metricCard({ x: 398, y: 138, w: 306, h: 92, label: "TOTAL STARS", value: fmtNumber(data.totalStars), color: "#A855F7", number: "02", delay: 2 })}
+  ${metricCard({ x: 56, y: 250, w: 306, h: 92, label: "TOTAL FORKS", value: fmtNumber(data.totalForks), color: "#FBBF24", number: "03", delay: 3 })}
+  ${metricCard({ x: 398, y: 250, w: 306, h: 92, label: "GITHUB SPACES", value: fmtNumber(spaces), color: "#00FF88", number: "04", delay: 4 })}
+  <g class="fadeUp delay5">
+    <rect x="56" y="370" width="648" height="94" rx="24" fill="#111827" stroke="#303B55"/>
+    <circle class="pulse" cx="84" cy="405" r="7" fill="#00FF88"/>
+    <text x="106" y="401" fill="#C9D1D9" font-size="13" font-weight="900" letter-spacing="1">SHIP MODE</text>
+    <text x="106" y="426" fill="#E6EDF3" font-size="17" font-weight="800">${esc(focus)} · backend APIs · VPS/server work</text>
+    <text class="mono" x="106" y="447" fill="#8B949E" font-size="11">${esc(trimText(note, 82))}</text>
+  </g>
+</g>`;
+
+  return svgShell({
+    id,
+    width,
+    height,
+    title: `GitHub pulse for ${PROFILE_USERNAME}`,
+    desc: "Animated local SVG card with public GitHub profile statistics, clipped rounded backgrounds, and a mobile-safe stat grid.",
+    children,
+    extraDefs,
+  });
 }
 
-function metricCard(x, y, label, value, color, number) {
-  return `<g class="fadeIn">
-    <rect x="${x}" y="${y}" width="176" height="78" rx="18" fill="#121A2A" stroke="#2A3753"/>
-    <text x="${x + 18}" y="${y + 27}" fill="#8B949E" font-size="11" font-weight="800">${esc(label)}</text>
-    <text x="${x + 18}" y="${y + 60}" fill="${color}" font-size="31" font-weight="900">${esc(value)}</text>
-    <text x="${x + 142}" y="${y + 30}" fill="#26324A" font-size="23" font-weight="900">${number}</text>
-  </g>`;
+function languageRow(lang, index) {
+  const x = 62;
+  const y = 138 + index * 44;
+  const trackWidth = 636;
+  const barWidth = Math.max(12, Math.round((trackWidth * lang.pct) / 100));
+  const duration = (0.72 + index * 0.08).toFixed(2);
+  return `<g class="fadeUp delay${Math.min(index + 1, 7)} font">
+  <text x="${x}" y="${y}" fill="#D1D5DB" font-size="14" font-weight="850">${esc(trimText(lang.name, 24))}</text>
+  <text x="${x + trackWidth}" y="${y}" fill="#9CA3AF" font-size="12" font-weight="800" text-anchor="end">${lang.pct}%</text>
+  <rect x="${x}" y="${y + 12}" width="${trackWidth}" height="16" rx="9" fill="#202A3F"/>
+  <rect class="barGlow" x="${x}" y="${y + 12}" width="${barWidth}" height="16" rx="9" fill="${esc(lang.color)}">
+    <animate attributeName="width" from="8" to="${barWidth}" dur="${duration}s" fill="freeze" calcMode="spline" keySplines=".2 .8 .2 1"/>
+  </rect>
+  <rect x="${x + 4}" y="${y + 16}" width="${Math.max(0, barWidth - 8)}" height="3" rx="2" fill="#FFFFFF" opacity="0.25"/>
+</g>`;
 }
 
 function languagesSvg(data) {
+  const id = "langs";
+  const width = 760;
+  const height = 560;
   const langs = data.topLanguages.slice(0, 8);
-  const rows = langs
-    .map((lang, index) => {
-      const y = 128 + index * 31;
-      const width = Math.max(8, Math.round((390 * lang.pct) / 100));
-      return `<g font-family="Inter, Segoe UI, Arial, sans-serif">
-      <text x="62" y="${y + 14}" fill="#D1D5DB" font-size="14" font-weight="800">${esc(lang.name)}</text>
-      <text x="678" y="${y + 14}" fill="#9CA3AF" font-size="12" text-anchor="end">${lang.pct}%</text>
-      <rect x="190" y="${y}" width="445" height="15" rx="8" fill="#202A3F"/>
-      <rect x="190" y="${y}" width="${width}" height="15" rx="8" fill="${esc(lang.color)}"><animate attributeName="width" from="0" to="${width}" dur="${0.7 + index * 0.08}s" fill="freeze"/></rect>
-    </g>`;
-    })
-    .join("\n");
+  const summary = trimText(
+    `${USERS.map((u) => `@${u}`).join(" + ")} · ${data.fallback ? "fallback" : "live"} language bytes · ${data.updated}`,
+    82,
+  );
+  const mesh = `M0 148C112 46 192 178 295 104C404 26 488 34 582 122C656 191 708 104 760 72V560H0V148Z`;
+  const rows = langs.map(languageRow).join("\n");
 
-  const summary = `${USERS.map((u) => `@${u}`).join(" + ")} · ${data.fallback ? "fallback" : "live"} language bytes · ${data.updated}`;
-  return `<svg width="760" height="420" viewBox="0 0 760 420" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
-<title id="title">Top languages for ${esc(PROFILE_USERNAME)}</title>
-<desc id="desc">Animated local SVG top-language card generated from public repository language bytes.</desc>
-<defs>
-  <linearGradient id="bg" x1="0" y1="0" x2="760" y2="420" gradientUnits="userSpaceOnUse"><stop stop-color="#08111F"/><stop offset="0.55" stop-color="#111B34"/><stop offset="1" stop-color="#25103D"/></linearGradient>
-  <linearGradient id="mesh" x1="0" y1="0" x2="760" y2="420" gradientUnits="userSpaceOnUse"><stop stop-color="#00FF88" stop-opacity="0.25"/><stop offset="0.45" stop-color="#22D3EE" stop-opacity="0.20"/><stop offset="1" stop-color="#A855F7" stop-opacity="0.30"/></linearGradient>
-  <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#000000" flood-opacity="0.45"/></filter>
-</defs>
-${animatedStyle}
-<rect width="760" height="420" rx="30" fill="url(#bg)"/>
-<path d="M0 118C112 28 189 142 295 82C401 22 488 16 579 91C655 153 704 93 760 54V420H0V118Z" fill="url(#mesh)" opacity="0.52"/>
-<circle class="float" cx="650" cy="85" r="72" fill="#22D3EE" opacity="0.10"/>
-<rect x="28" y="28" width="704" height="364" rx="26" fill="#0D1117" fill-opacity="0.78" stroke="#273550" filter="url(#shadow)"/>
-<g font-family="Inter, Segoe UI, Arial, sans-serif">
-  <text x="56" y="73" fill="#E6EDF3" font-size="30" font-weight="900">Top language mix</text>
-  <text x="58" y="101" fill="#9CA3AF" font-family="Fira Code, Consolas, monospace" font-size="13">${esc(summary)}</text>
+  const children = `${panel(id, width, height, mesh)}
+<g class="font">
+  <text x="56" y="80" fill="#E6EDF3" font-size="32" font-weight="950">Top language mix</text>
+  <text class="mono" x="58" y="110" fill="#9CA3AF" font-size="13">${esc(summary)}</text>
   ${rows}
-  <text x="58" y="375" fill="#8B949E" font-family="Fira Code, Consolas, monospace" font-size="11">Overflow fixed: taller canvas + safe row spacing. Workflow refreshes this from live public repos.</text>
-</g>
-</svg>`;
+  <g class="fadeUp delay7">
+    <rect x="56" y="500" width="648" height="28" rx="14" fill="#0F172A" stroke="#26324A"/>
+    <text class="mono" x="72" y="519" fill="#8B949E" font-size="11">Mobile fix: rows are stacked with full-width progress bars, not squeezed table columns.</text>
+  </g>
+</g>`;
+
+  return svgShell({
+    id,
+    width,
+    height,
+    title: `Top languages for ${PROFILE_USERNAME}`,
+    desc: "Animated top-language card generated from public repository language bytes with mobile-safe row spacing.",
+    children,
+  });
 }
 
 function streakSvg(data) {
+  const id = "streak";
+  const width = 760;
+  const height = 520;
   const c = data.contribution || {};
   const current = fmtNumber(c.current || 0);
   const longest = fmtNumber(c.longest || 0);
   const activeDays = fmtNumber(c.activeDays || 0);
   const total = fmtNumber(c.totalContributions || 0);
-  const lastActive = c.lastActive || "after workflow run";
-  const subtitle = `${PROFILE_USERNAME} contribution calendar · ${data.fallback || !TOKEN ? "workflow-powered" : "live"} streak card · ${data.updated}`;
+  const lastActive = trimText(c.lastActive || "after workflow run", 16);
+  const subtitle = trimText(
+    `${PROFILE_USERNAME} contribution calendar · ${data.fallback || !TOKEN ? "workflow-powered" : "live"} streak card · ${data.updated}`,
+    82,
+  );
+  const mesh = `M0 364C96 250 176 334 276 236C372 142 454 202 536 112C620 20 690 74 760 34V520H0V364Z`;
 
-  return `<svg width="760" height="420" viewBox="0 0 760 420" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
-<title id="title">GitHub streak for ${esc(PROFILE_USERNAME)}</title>
-<desc id="desc">Animated local SVG streak card generated from the GitHub contribution calendar.</desc>
-<defs>
-  <linearGradient id="bg" x1="0" y1="0" x2="760" y2="420" gradientUnits="userSpaceOnUse"><stop stop-color="#0A1020"/><stop offset="0.48" stop-color="#16142D"/><stop offset="1" stop-color="#2B1035"/></linearGradient>
-  <linearGradient id="fire" x1="150" y1="60" x2="650" y2="360" gradientUnits="userSpaceOnUse"><stop stop-color="#FBBF24"/><stop offset="0.45" stop-color="#FF6B6B"/><stop offset="1" stop-color="#A855F7"/></linearGradient>
-  <linearGradient id="aqua" x1="0" y1="0" x2="760" y2="420" gradientUnits="userSpaceOnUse"><stop stop-color="#22D3EE"/><stop offset="1" stop-color="#00FF88"/></linearGradient>
-  <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#000000" flood-opacity="0.45"/></filter>
-  <filter id="glow"><feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-</defs>
-${animatedStyle}
-<rect width="760" height="420" rx="30" fill="url(#bg)"/>
-<circle class="float" cx="176" cy="224" r="118" fill="#FBBF24" opacity="0.08"/>
-<circle class="float2" cx="620" cy="96" r="102" fill="#22D3EE" opacity="0.10"/>
-<path d="M0 304C95 206 174 280 271 203C369 126 444 172 525 105C613 32 682 61 760 22V420H0V304Z" fill="url(#fire)" opacity="0.17"/>
-<rect x="28" y="28" width="704" height="364" rx="26" fill="#0D1117" fill-opacity="0.78" stroke="#273550" filter="url(#shadow)"/>
-<g font-family="Inter, Segoe UI, Arial, sans-serif">
-  <text x="56" y="73" fill="#E6EDF3" font-size="30" font-weight="900">Streak engine</text>
-  <text x="58" y="101" fill="#9CA3AF" font-family="Fira Code, Consolas, monospace" font-size="13">${esc(subtitle)}</text>
-  <g transform="translate(72 136)">
-    <circle cx="112" cy="112" r="92" stroke="#202A3F" stroke-width="18"/>
-    <circle class="dash" cx="112" cy="112" r="92" stroke="url(#fire)" stroke-width="18" stroke-linecap="round" fill="none" transform="rotate(-90 112 112)" filter="url(#glow)"/>
-    <text x="112" y="101" fill="#FBBF24" font-size="54" font-weight="900" text-anchor="middle">${current}</text>
-    <text x="112" y="130" fill="#C9D1D9" font-size="15" font-weight="800" text-anchor="middle">current streak</text>
-    <text x="112" y="151" fill="#8B949E" font-size="12" text-anchor="middle">days</text>
+  const children = `${panel(id, width, height, mesh, "fire")}
+<g class="font">
+  <text x="56" y="80" fill="#E6EDF3" font-size="32" font-weight="950">Streak engine</text>
+  <text class="mono" x="58" y="110" fill="#9CA3AF" font-size="13">${esc(subtitle)}</text>
+  <g class="fadeUp delay1" transform="translate(70 145)">
+    <circle cx="118" cy="118" r="96" stroke="#202A3F" stroke-width="19"/>
+    <circle class="dash" cx="118" cy="118" r="96" stroke="url(#${id}-fire)" stroke-width="19" stroke-linecap="round" fill="none" transform="rotate(-90 118 118)" filter="url(#${id}-glow)"/>
+    <circle class="pulse" cx="196" cy="50" r="8" fill="#FBBF24"/>
+    <text x="118" y="108" fill="#FBBF24" font-size="56" font-weight="950" text-anchor="middle">${esc(current)}</text>
+    <text x="118" y="139" fill="#C9D1D9" font-size="15" font-weight="850" text-anchor="middle">current streak</text>
+    <text x="118" y="161" fill="#8B949E" font-size="12" text-anchor="middle">days</text>
   </g>
-  ${smallStat(348, 150, "LONGEST", `${longest} days`, "#A855F7")}
-  ${smallStat(536, 150, "ACTIVE DAYS", activeDays, "#22D3EE")}
-  ${smallStat(348, 244, "YEARLY CONTRIBUTIONS", total, "#00FF88")}
-  ${smallStat(536, 244, "LAST ACTIVE", lastActive, "#FBBF24", 12)}
-  <text x="58" y="372" fill="#8B949E" font-family="Fira Code, Consolas, monospace" font-size="11">Uses GraphQL in GitHub Actions for live streaks; fallback SVG still renders beautifully before the first run.</text>
-</g>
-</svg>`;
+  ${smallStat({ x: 350, y: 154, w: 160, h: 82, label: "LONGEST", value: `${longest} days`, color: "#A855F7", delay: 2 })}
+  ${smallStat({ x: 532, y: 154, w: 160, h: 82, label: "ACTIVE DAYS", value: activeDays, color: "#22D3EE", delay: 3 })}
+  ${smallStat({ x: 350, y: 258, w: 160, h: 82, label: "CONTRIBUTIONS", value: total, color: "#00FF88", delay: 4 })}
+  ${smallStat({ x: 532, y: 258, w: 160, h: 82, label: "LAST ACTIVE", value: lastActive, color: "#FBBF24", valueSize: 16, delay: 5 })}
+  <g class="fadeUp delay6">
+    <rect x="56" y="404" width="648" height="58" rx="22" fill="#111827" stroke="#303B55"/>
+    <text class="mono" x="78" y="438" fill="#8B949E" font-size="11">GraphQL powers live streaks in GitHub Actions; fallback still renders before the first tokenized run.</text>
+  </g>
+</g>`;
+
+  return svgShell({
+    id,
+    width,
+    height,
+    title: `GitHub streak for ${PROFILE_USERNAME}`,
+    desc: "Animated local SVG streak card generated from the GitHub contribution calendar.",
+    children,
+  });
 }
 
-function smallStat(x, y, label, value, color, valueSize = 23) {
-  return `<g class="fadeIn">
-    <rect x="${x}" y="${y}" width="158" height="72" rx="18" fill="#121A2A" stroke="#2A3753"/>
-    <text x="${x + 18}" y="${y + 27}" fill="#8B949E" font-size="11" font-weight="800">${esc(label)}</text>
-    <text x="${x + 18}" y="${y + 56}" fill="${color}" font-size="${valueSize}" font-weight="900">${esc(value)}</text>
-  </g>`;
+function readmeSnippet() {
+  return `<!-- Drop this in your README instead of a markdown table. It stacks cleanly on mobile. -->
+<div align="center">
+  <img src="./${OUT_DIR}/github-pulse.svg" width="100%" alt="GitHub pulse" />
+  <br />
+  <img src="./${OUT_DIR}/top-languages.svg" width="100%" alt="Top language mix" />
+  <br />
+  <img src="./${OUT_DIR}/streak-card.svg" width="100%" alt="GitHub streak" />
+</div>
+`;
 }
 
 async function main() {
@@ -444,7 +625,7 @@ async function main() {
 
   const pulse = githubPulseSvg(data);
   await writeFile(path.join(OUT_DIR, "github-pulse.svg"), pulse, "utf8");
-  await writeFile(path.join(OUT_DIR, "github-stats.svg"), pulse, "utf8"); // compatibility alias
+  await writeFile(path.join(OUT_DIR, "github-stats.svg"), pulse, "utf8");
   await writeFile(
     path.join(OUT_DIR, "top-languages.svg"),
     languagesSvg(data),
@@ -455,6 +636,15 @@ async function main() {
     streakSvg(data),
     "utf8",
   );
+
+  if (WRITE_README_SNIPPET) {
+    await writeFile(
+      path.join(OUT_DIR, "profile-cards-readme.md"),
+      readmeSnippet(),
+      "utf8",
+    );
+  }
+
   console.log(`Generated animated profile cards for ${USERS.join(", ")}`);
 }
 
