@@ -33,7 +33,7 @@ const utsho = {
   role: "Full-stack developer with a backend obsession",
   currentQuest: "Learning Rust and building systems from scratch",
   backendToolkit: [
-    "NestJS", "Express", "ElysiaJS", "Bun", "Node.js", "PostgreSQL",
+    "NestJS", "Express", "ElysiaJS", "Bun", "Node.js", "Go', "PostgreSQL",
     "MongoDB", "Drizzle", "Prisma", "Docker", "OpenAPI/Swagger", "Postman"
   ],
   frontendToolkit: ["React", "Next.js", "TanStack Start", "TypeScript", "Tailwind", "DaisyUI"],
