@@ -28,34 +28,28 @@
 
 ```ts
 const utsho = {
-  location: "Dhaka, Bangladesh 🇧🇩",
+  location: "Dhaka, Bangladesh",
   timezone: "GMT+6 / BST",
   role: "Full-stack developer with a backend obsession",
   currentQuest: "Learning Rust and building systems from scratch",
   backendToolkit: [
-    "NestJS", "Express", "ElysiaJS", "Bun", "Node.js", "Go', "PostgreSQL",
+    "NestJS", "Express", "ElysiaJS", "Bun", "Node.js", "Go', "Rust", "PostgreSQL",
     "MongoDB", "Drizzle", "Prisma", "Docker", "OpenAPI/Swagger", "Postman"
   ],
   frontendToolkit: ["React", "Next.js", "TanStack Start", "TypeScript", "Tailwind", "DaisyUI"],
   opsSetup: ["Linux", "Arch", "Neovim", "VPS deploys", "server setup", "Vercel"],
   systemsSideQuests: ["Rust", "Go", "tiny databases", "shells", "interpreters", "parser combinators"],
   openTo: ["collaboration", "backend projects", "full-stack apps", "open source experiments"],
-  motto: "Make it useful. Make it fast. Make it a little delightful.",
+  motto: "Code is like magic with the power to change the world.",
 };
 ```
 
-<table>
-  <tr>
-    <td width="50%">
-      <h3>🛠️ What I build</h3>
-      <p>Full-stack products with polished interfaces, auth flows, dashboards, marketplaces, APIs, database schemas, deployment-ready backends, and VPS/server work.</p>
-    </td>
-    <td width="50%">
-      <h3>🧪 What I explore</h3>
-      <p>Rust, Go, tiny databases, scripting languages, parser combinators, shell/server experiments, and anything that reveals how computers really work.</p>
-    </td>
-  </tr>
-</table>
+
+<h3>🛠️ What I build</h3>
+<p>Full-stack products with polished interfaces, auth flows, dashboards, marketplaces, APIs, database schemas, deployment-ready backends, and VPS/server work.</p>
+
+<h3>🧪 What I explore</h3>
+<p>Rust, Go, tiny databases, scripting languages, parser combinators, shell/server experiments, and anything that reveals how computers really work.</p>
 
 ---
 
