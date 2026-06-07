@@ -28,33 +28,33 @@
 <rect x="28" y="28" width="704" height="364" rx="26" fill="#0D1117" fill-opacity="0.78" stroke="#273550" filter="url(#shadow)"/>
 <g font-family="Inter, Segoe UI, Arial, sans-serif">
   <text x="56" y="73" fill="#E6EDF3" font-size="30" font-weight="900">Streak engine</text>
-  <text x="58" y="101" fill="#9CA3AF" font-family="Fira Code, Consolas, monospace" font-size="13">utshomh contribution calendar · live streak card · Jun 06, 2026</text>
+  <text x="58" y="101" fill="#9CA3AF" font-family="Fira Code, Consolas, monospace" font-size="13">utshomh contribution calendar · live streak card · Jun 07, 2026</text>
   <g transform="translate(72 136)">
     <circle cx="112" cy="112" r="92" stroke="#202A3F" stroke-width="18"/>
     <circle class="dash" cx="112" cy="112" r="92" stroke="url(#fire)" stroke-width="18" stroke-linecap="round" fill="none" transform="rotate(-90 112 112)" filter="url(#glow)"/>
-    <text x="112" y="101" fill="#FBBF24" font-size="54" font-weight="900" text-anchor="middle">19</text>
+    <text x="112" y="101" fill="#FBBF24" font-size="54" font-weight="900" text-anchor="middle">20</text>
     <text x="112" y="130" fill="#C9D1D9" font-size="15" font-weight="800" text-anchor="middle">current streak</text>
     <text x="112" y="151" fill="#8B949E" font-size="12" text-anchor="middle">days</text>
   </g>
   <g class="fadeIn">
     <rect x="348" y="150" width="158" height="72" rx="18" fill="#121A2A" stroke="#2A3753"/>
     <text x="366" y="177" fill="#8B949E" font-size="11" font-weight="800">LONGEST</text>
-    <text x="366" y="206" fill="#A855F7" font-size="23" font-weight="900">19 days</text>
+    <text x="366" y="206" fill="#A855F7" font-size="23" font-weight="900">20 days</text>
   </g>
   <g class="fadeIn">
     <rect x="536" y="150" width="158" height="72" rx="18" fill="#121A2A" stroke="#2A3753"/>
     <text x="554" y="177" fill="#8B949E" font-size="11" font-weight="800">ACTIVE DAYS</text>
-    <text x="554" y="206" fill="#22D3EE" font-size="23" font-weight="900">93</text>
+    <text x="554" y="206" fill="#22D3EE" font-size="23" font-weight="900">94</text>
   </g>
   <g class="fadeIn">
     <rect x="348" y="244" width="158" height="72" rx="18" fill="#121A2A" stroke="#2A3753"/>
     <text x="366" y="271" fill="#8B949E" font-size="11" font-weight="800">YEARLY CONTRIBUTIONS</text>
-    <text x="366" y="300" fill="#00FF88" font-size="23" font-weight="900">333</text>
+    <text x="366" y="300" fill="#00FF88" font-size="23" font-weight="900">334</text>
   </g>
   <g class="fadeIn">
     <rect x="536" y="244" width="158" height="72" rx="18" fill="#121A2A" stroke="#2A3753"/>
     <text x="554" y="271" fill="#8B949E" font-size="11" font-weight="800">LAST ACTIVE</text>
-    <text x="554" y="300" fill="#FBBF24" font-size="12" font-weight="900">2026-06-06</text>
+    <text x="554" y="300" fill="#FBBF24" font-size="12" font-weight="900">2026-06-07</text>
   </g>
   <text x="58" y="372" fill="#8B949E" font-family="Fira Code, Consolas, monospace" font-size="11">Uses GraphQL in GitHub Actions for live streaks; fallback SVG still renders beautifully before the first run.</text>
 </g>
