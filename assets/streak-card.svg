@@ -28,7 +28,7 @@
 <rect x="28" y="28" width="704" height="364" rx="26" fill="#0D1117" fill-opacity="0.78" stroke="#273550" filter="url(#shadow)"/>
 <g font-family="Inter, Segoe UI, Arial, sans-serif">
   <text x="56" y="73" fill="#E6EDF3" font-size="30" font-weight="900">Streak engine</text>
-  <text x="58" y="101" fill="#9CA3AF" font-family="Fira Code, Consolas, monospace" font-size="13">utshomh contribution calendar · live streak card · Jun 25, 2026</text>
+  <text x="58" y="101" fill="#9CA3AF" font-family="Fira Code, Consolas, monospace" font-size="13">utshomh contribution calendar · live streak card · Jun 26, 2026</text>
   <g transform="translate(72 136)">
     <circle cx="112" cy="112" r="92" stroke="#202A3F" stroke-width="18"/>
     <circle class="dash" cx="112" cy="112" r="92" stroke="url(#fire)" stroke-width="18" stroke-linecap="round" fill="none" transform="rotate(-90 112 112)" filter="url(#glow)"/>
