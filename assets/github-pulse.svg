@@ -44,7 +44,7 @@
   <g class="fadeIn">
     <rect x="474" y="132" width="176" height="78" rx="18" fill="#121A2A" stroke="#2A3753"/>
     <text x="492" y="159" fill="#8B949E" font-size="11" font-weight="800">TOTAL FORKS</text>
-    <text x="492" y="192" fill="#FBBF24" font-size="31" font-weight="900">8</text>
+    <text x="492" y="192" fill="#FBBF24" font-size="31" font-weight="900">9</text>
     <text x="616" y="162" fill="#26324A" font-size="23" font-weight="900">03</text>
   </g>
   <g class="fadeIn">
@@ -57,6 +57,6 @@
   <circle class="pulse" cx="88" cy="264" r="7" fill="#00FF88"/>
   <text x="108" y="259" fill="#C9D1D9" font-size="13" font-weight="800">SHIP MODE</text>
   <text x="108" y="281" fill="#E6EDF3" font-size="16" font-weight="700">TypeScript · JavaScript · Rust · PHP · backend APIs · VPS/server work · language tooling</text>
-  <text x="108" y="301" fill="#8B949E" font-size="11">Latest public update: utshowmh/func</text>
+  <text x="108" y="301" fill="#8B949E" font-size="11">Latest public update: utshomh/crab</text>
 </g>
 </svg>

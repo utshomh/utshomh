@@ -28,9 +28,9 @@
   <text x="58" y="101" fill="#9CA3AF" font-family="Fira Code, Consolas, monospace" font-size="13">@utshomh + @utshowmh + @utsho-fleekbd · live language bytes · Oct 13, 2026</text>
   <g font-family="Inter, Segoe UI, Arial, sans-serif">
       <text x="62" y="142" fill="#D1D5DB" font-size="14" font-weight="800">TypeScript</text>
-      <text x="678" y="142" fill="#9CA3AF" font-size="12" text-anchor="end">57%</text>
+      <text x="678" y="142" fill="#9CA3AF" font-size="12" text-anchor="end">56%</text>
       <rect x="190" y="128" width="445" height="15" rx="8" fill="#202A3F"/>
-      <rect x="190" y="128" width="222" height="15" rx="8" fill="#3178C6"><animate attributeName="width" from="0" to="222" dur="0.7s" fill="freeze"/></rect>
+      <rect x="190" y="128" width="218" height="15" rx="8" fill="#3178C6"><animate attributeName="width" from="0" to="218" dur="0.7s" fill="freeze"/></rect>
     </g>
 <g font-family="Inter, Segoe UI, Arial, sans-serif">
       <text x="62" y="173" fill="#D1D5DB" font-size="14" font-weight="800">JavaScript</text>
@@ -40,9 +40,9 @@
     </g>
 <g font-family="Inter, Segoe UI, Arial, sans-serif">
       <text x="62" y="204" fill="#D1D5DB" font-size="14" font-weight="800">Rust</text>
-      <text x="678" y="204" fill="#9CA3AF" font-size="12" text-anchor="end">12%</text>
+      <text x="678" y="204" fill="#9CA3AF" font-size="12" text-anchor="end">13%</text>
       <rect x="190" y="190" width="445" height="15" rx="8" fill="#202A3F"/>
-      <rect x="190" y="190" width="47" height="15" rx="8" fill="#DEA584"><animate attributeName="width" from="0" to="47" dur="0.86s" fill="freeze"/></rect>
+      <rect x="190" y="190" width="51" height="15" rx="8" fill="#DEA584"><animate attributeName="width" from="0" to="51" dur="0.86s" fill="freeze"/></rect>
     </g>
 <g font-family="Inter, Segoe UI, Arial, sans-serif">
       <text x="62" y="235" fill="#D1D5DB" font-size="14" font-weight="800">PHP</text>
